@@ -1,8 +1,8 @@
 package datadump
 
 import (
-	elastic "github.com/mattbaird/elastigo/lib"
 	"strconv"
+	elastic "github.com/mattbaird/elastigo/lib"
 )
 
 type EveTypeIdList struct {

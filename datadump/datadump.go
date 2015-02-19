@@ -1,9 +1,10 @@
 package datadump
 
 import (
-	yaml "gopkg.in/yaml.v2"
-	"io/ioutil"
 	"strconv"
+	"io/ioutil"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 func ReadData(yamlPath string) (result map[string]map[string]interface{}, err error) {

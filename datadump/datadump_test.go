@@ -3,7 +3,7 @@ package datadump
 import (
 	"testing"
 	"encoding/json"
-	_ "fmt"
+	// "fmt"
 )
 
 func TestAverage(t *testing.T) {
