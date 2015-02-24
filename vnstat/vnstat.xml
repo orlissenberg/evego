@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+    <short>vnstat</short>
+    <description>VNStat</description>
+    <port protocol="tcp" port="4545"/>
+</service>
