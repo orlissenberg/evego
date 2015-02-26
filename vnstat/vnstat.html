@@ -1,14 +1,62 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>VNStat</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
     <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <style type="text/css">
+        @media (min-width: 1200px) {
+            .container {
+                width: 1000px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>VNStat</h1>
 
-<div style="width:1000px;">
-    <canvas id="myChart"></canvas>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>vnStat</h1>
+        </div>
+    </div>    
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Monthly</h4>
+            <div>
+                <canvas id="monthChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h4>Daily</h4>
+            <div>
+                <canvas id="dayChart"></canvas>
+            </div>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Hourly</h4>           
+            <div>
+                <canvas id="hourChart"></canvas>
+            </div>
+            <div id="hourLegend"></div>
+        </div>        
+    </div>    
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <a target="vnstat" href="http://humdi.net/vnstat/">vnStat</a>
+                <br/>
+                <a target="chartjs" href="http://www.chartjs.org/docs/">Chart.js</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -173,7 +221,7 @@
             pointDotStrokeWidth: 1,
 
             //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-            pointHitDetectionRadius: 20,
+            pointHitDetectionRadius: 4,
 
             //Boolean - Whether to show a stroke for datasets
             datasetStroke: true,
@@ -189,42 +237,104 @@
 
         };
 
-        $.get("/stats", function (jsonData) {
+        var chartData = function(chartLabels, chartData, chartLabel) {
+            var pointStroke = "#556270"
+
+            var data = {
+                labels: chartLabels,
+                datasets: [
+                    {
+                        label: chartLabel,
+                        fillColor: "#FFFFFF",
+                        strokeColor: pointStroke,
+                        pointColor: pointStroke,
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(220,220,220,1)",
+                        data: chartData
+                    }
+                ]
+            };
+
+            return data;
+        }
+
+        var hoursData = function(jsonData) {
+            var hours = jsonData.Interfaces[0].Traffic.Hours;
+
+            hours.sort(function (a, b) {
+                var parts = a.Date.split('-');
+                var dateA = new Date(parts[0], parts[1]-1, parts[2], a.Id);
+
+                parts = b.Date.split('-');
+                var dateB = new Date(parts[0], parts[1]-1, parts[2], b.Id);
+
+                return dateA > dateB ? 1 : -1;
+            });
+
+            var labels = [];
+            var vnstatData = [];
+
+            for (var i = 0; i < hours.length; i++) {
+                labels.push(hours[i].Date + " " + hours[i].Id + ":00");
+                var total = Math.round((hours[i].Tx + hours[i].Rx) / 1024)
+                vnstatData.push(total);
+            }
+
+            return chartData(labels, vnstatData, hours[0].Date)
+        }
+
+        var daysData = function(jsonData) {
             var days = jsonData.Interfaces[0].Traffic.Days;
 
             days.sort(function (a, b) {
                 return a.Id < b.Id ? 1 : -1;
             });
-            console.debug(days);
 
             var labels = [];
             var vnstatData = [];
 
             for (var i = 0; i < days.length; i++) {
                 labels.push(days[i].Date);
-                vnstatData.push((days[i].Tx + days[i].Rx) / 1000);
+                var total = Math.round((days[i].Tx + days[i].Rx) / 1024)
+                vnstatData.push(total);
             }
 
-            var data = {
-                labels: labels,
-                datasets: [
-                    {
-                        label: "My First dataset",
-                        fillColor: "rgba(220,220,220,0.2)",
-                        strokeColor: "rgba(220,220,220,1)",
-                        pointColor: "rgba(220,220,220,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(220,220,220,1)",
-                        data: vnstatData
-                    }
-                ]
-            };
+            return chartData(labels, vnstatData)
+        }
 
-            console.debug(data);
+        var monthsData = function(jsonData) {
+            var months = jsonData.Interfaces[0].Traffic.Months;
 
-            var ctx = document.getElementById("myChart").getContext("2d");
-            new Chart(ctx).Line(data, options);
+            months.sort(function (a, b) {
+                return a.Id < b.Id ? 1 : -1;
+            });
+
+            var labels = [];
+            var vnstatData = [];
+
+            for (var i = 0; i < months.length; i++) {
+                labels.push(months[i].Date);
+                var total = Math.round(((months[i].Tx + months[i].Rx) / 1024)) / 1000
+                vnstatData.push(total);
+            }
+
+            return chartData(labels, vnstatData)
+        }
+
+        $.get("/stats", function (jsonData) {
+            Chart.defaults.global.tooltipTemplate = "<%if (label){%><%=label%>: <%}%><%= value %> MiB";
+            var ctx = document.getElementById("hourChart").getContext("2d");            
+            var hourChart = new Chart(ctx).Line(hoursData(jsonData), options);
+            // $('#hourLegend').html(hourChart.generateLegend());
+
+            Chart.defaults.global.tooltipTemplate = "<%if (label){%><%=label%>: <%}%><%= value %> MiB";
+            var ctx = document.getElementById("dayChart").getContext("2d");            
+            var dayChart = new Chart(ctx).Line(daysData(jsonData), options);
+
+            Chart.defaults.global.tooltipTemplate = "<%if (label){%><%=label%>: <%}%><%= value %> GiB";
+            var ctx = document.getElementById("monthChart").getContext("2d");            
+            var monthChart = new Chart(ctx).Line(monthsData(jsonData), options);
         });
     });
 
