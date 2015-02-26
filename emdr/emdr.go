@@ -7,20 +7,19 @@ import (
 	"compress/zlib"
 	"time"
 	"strconv"
-	"os"
-	"fmt"
+	"log"
 	zmq "github.com/pebbe/zmq2"
 )
 
 type EmdrClient struct {
-	sub *zmq.Socket
-	address string
+	*zmq.Socket
+	Address string
 }
 
 func NewEmdr(address string) (client *EmdrClient, err error) {
 	client = new(EmdrClient)
-	client.sub, err = zmq.NewSocket(zmq.SUB)
-	client.address = address
+	client.Address = address
+	client.Socket, err = zmq.NewSocket(zmq.SUB)
 
 	return
 }
@@ -32,22 +31,25 @@ type EmdrWriter interface {
 	DeleteAll() (err error)
 }
 
-type EmdrMessage struct {
-	ResultType string "resultType"
-}
-
 func UnixTimeStampString() string {
 	return strconv.FormatInt(time.Now().Unix(), 10)
 }
 
-func (client *EmdrClient) Start(writer EmdrWriter) {
-	//	duration := time.Millisecond * time.Duration(300)
-	//	time.Sleep(duration)
-	//	data, _ := ioutil.ReadFile("zlib_encoded.json")
+func DumpToFile(data []byte) {
+	ioutil.WriteFile("error_order_"+UnixTimeStampString()+".json", data, 0644)
+}
 
+func (client *EmdrClient) Start(writer EmdrWriter) {
 	errCount := 0
+
+	err := client.Connect(client.Address)
+	client.SetSubscribe("")
+	if err != nil {
+		log.Fatalln("Failed to connect: " + err.Error())
+	}
+
 	for {
-		msg, err := client.sub.Recv(0)
+		msg, err := client.Recv(0)
 
 		if err == nil {
 			var output []byte
@@ -60,11 +62,10 @@ func (client *EmdrClient) Start(writer EmdrWriter) {
 
 		if err != nil {
 			if (errCount < 10) {
-				fmt.Printf("E%d.", errCount)
-				errCount++
+				log.Println(err.Error)
+				errCount++;
 			} else {
-				fmt.Println("Flippin' table, goodbye")
-				os.Exit(1)
+				log.Fatalln(err.Error)
 			}
 		}
 	}
@@ -83,14 +84,4 @@ func ZlibDecode(encoded string) (decoded []byte, err error) {
 	}
 
 	return
-}
-
-func (client *EmdrClient) Connect() (err error) {
-	err = client.sub.Connect(client.address)
-	client.sub.SetSubscribe("")
-	return
-}
-
-func (client *EmdrClient) Close() {
-	client.sub.Close()
 }
