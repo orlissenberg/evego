@@ -56,16 +56,16 @@ func (client *EmdrClient) Start(writer EmdrWriter) {
 			output, err = ZlibDecode(msg)
 
 			if err == nil {
-				writer.Write(output)
+				err = writer.Write(output)
 			}
 		}
 
 		if err != nil {
 			if (errCount < 10) {
-				log.Println(err.Error)
+				log.Println(err.Error())
 				errCount++;
 			} else {
-				log.Fatalln(err.Error)
+				log.Fatalln(err.Error())
 			}
 		}
 	}

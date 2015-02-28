@@ -1,4 +1,4 @@
-package main
+package dbdump
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-func main() {
+func LoadInvTypes() {
 	db, _ := gorm.Open("mssql", `server=localhost;user id=eve;password=eve;database=eve_data`)
 	db.LogMode(true)
 	db.DB()

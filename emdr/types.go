@@ -61,6 +61,11 @@ type EmdrHistoryRowSet struct {
 	DataRows    []map[string]interface{}
 }
 
+type EmdrHistoryDocument struct {
+	RegionID    int64
+	RegionName	string
+}
+
 func (history *EmdrHistoryMessage) mapRows() {
 	// Rewrite the data sets to a key:value format.
 	// Loop the sets.

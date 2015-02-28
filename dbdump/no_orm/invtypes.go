@@ -1,4 +1,4 @@
-package main
+package no_orm
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func main() {
+func LoadInvTypes() {
 	// connection string
 	connString := `server=localhost;user id=eve;password=eve;database=eve_data`
 
