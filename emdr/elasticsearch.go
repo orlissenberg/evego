@@ -3,6 +3,7 @@ package emdr
 import (
 	"encoding/json"
 	elastic "github.com/mattbaird/elastigo/lib"
+	db "github.com/orlissenberg/evego/dbdump"
 	"log"
 )
 
@@ -22,6 +23,26 @@ func (writer *ElasticEmdrWriter) Write(message []byte) (err error) {
 	return
 }
 
+func ReadRegion(id string) (region db.EveRegion, err error) {
+	c := elastic.NewConn()
+	c.Hosts = []string{"localhost"}
+
+	region = db.EveRegion{}
+	err = c.GetSource("eve", "region", id, nil, &region)
+
+	return
+}
+
+func ReadSolarSystem(id string) (system db.EveSolarSystem, err error) {
+	c := elastic.NewConn()
+	c.Hosts = []string{"localhost"}
+
+	system = db.EveSolarSystem{}
+	err = c.GetSource("eve", "solarsystem", id, nil, &system)
+
+	return
+}
+
 func (writer *ElasticEmdrWriter) WriteOrder(message []byte) (err error) {
 	order := new(EmdrOrderMessage)
 	json.Unmarshal(message, order)
@@ -29,9 +50,14 @@ func (writer *ElasticEmdrWriter) WriteOrder(message []byte) (err error) {
 
 	c := elastic.NewConn()
 	c.Hosts = []string{"localhost"}
-	log.Println("Order")
-	_, err = c.Index("eve", "order", "", nil, order)
 
+	for _, s := range order.RowSets {
+		for _, o := range s.DataRows {
+			_, err = c.Index("eve", "order", "", nil, o)
+		}
+	}
+
+	log.Println("Order")
 	return
 }
 
@@ -48,7 +74,7 @@ func (writer *ElasticEmdrWriter) WriteHistory(message []byte) (err error) {
 	return
 }
 
-func (writer *ElasticEmdrWriter) DeleteAll() (err error){
+func (writer *ElasticEmdrWriter) DeleteAll() (err error) {
 	log.Fatalln("NOT_IMPLEMENTED")
 
 	return

@@ -65,3 +65,62 @@ func ReadRegions(writer RegionWriter, path string) {
 	}
 	rows.Close()
 }
+
+type SolarSystemWriter interface {
+	Write(SolarSystem EveSolarSystem)
+}
+
+type EveSolarSystem struct {
+	Id   int64
+	Name string
+}
+
+func (SolarSystem *EveSolarSystem) String() string {
+	return strconv.FormatInt(SolarSystem.Id, 10) + " - " + SolarSystem.Name
+}
+
+// Stdout writer
+type StdoutSolarSystemWriter struct {}
+
+func (std *StdoutSolarSystemWriter) Write(SolarSystem EveSolarSystem) {
+	fmt.Println(SolarSystem.String())
+}
+
+// Elasticsearch writer
+type ElasticSolarSystemWriter struct {}
+
+func (std *ElasticSolarSystemWriter) Write(SolarSystem EveSolarSystem) {
+	c := elastic.NewConn()
+	c.Hosts = []string{"localhost"}
+
+	_, err := c.Index("eve", "solarsystem", strconv.FormatInt(SolarSystem.Id, 10), nil, SolarSystem)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(SolarSystem.String())
+}
+
+// Read from SQLite
+func ReadSolarSystems(writer SolarSystemWriter, path string) {
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("select SolarSystemId, SolarSystemName from mapSolarSystems")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var SolarSystem = EveSolarSystem{}
+		rows.Scan(&SolarSystem.Id, &SolarSystem.Name)
+		writer.Write(SolarSystem)
+	}
+	rows.Close()
+}
+
+
