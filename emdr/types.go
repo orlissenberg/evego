@@ -61,7 +61,7 @@ func (doc *EmdrOrderDocument) String() string {
 	return string(result)
 }
 
-func (order *EmdrOrderMessage) mapRows() {
+func (order *EmdrOrderMessage) mapRows(eve *EveReader) {
 	// Rewrite the data sets to a key:value format.
 	// Loop the sets.
 	for setIndex, setValue := range order.RowSets {
@@ -78,11 +78,17 @@ func (order *EmdrOrderMessage) mapRows() {
 			mapping.RegionId = setValue.RegionID
 			mapping.TypeId = setValue.TypeId
 
-			region, _ := ReadRegion(strconv.FormatInt(mapping.RegionId, 10))
+			region, _ := eve.ReadRegion(strconv.FormatInt(mapping.RegionId, 10))
 			mapping.RegionName = region.Name
 
-			solarsystem, _ := ReadSolarSystem(strconv.FormatInt(mapping.SolarSystemID, 10))
+			solarsystem, _ := eve.ReadSolarSystem(strconv.FormatInt(mapping.SolarSystemID, 10))
 			mapping.SolarSystemName = solarsystem.Name
+
+			invtype, _ := eve.ReadInvType(strconv.FormatInt(mapping.TypeId, 10))
+			mapping.TypeName = invtype.Name
+
+			station, _ := eve.ReadStation(strconv.FormatInt(mapping.StationID, 10))
+			mapping.StationName = station.Name
 
 			order.RowSets[setIndex].DataRows[rowIndex] = mapping
 		}
@@ -155,7 +161,7 @@ type EmdrHistoryDocument struct {
 	Average        float64
 }
 
-func (order *EmdrHistoryMessage) mapRows() {
+func (order *EmdrHistoryMessage) mapRows(eve *EveReader) {
 	// Rewrite the data sets to a key:value format.
 	// Loop the sets.
 	for setIndex, setValue := range order.RowSets {

@@ -26,7 +26,8 @@ func (writer *RedisEmdrWriter) Write(message []byte) (err error) {
 func (writer *RedisEmdrWriter) WriteOrder(message []byte) (err error) {
 	order := new(EmdrOrderMessage)
 	json.Unmarshal(message, order)
-	order.mapRows()
+
+	// order.mapRows()
 
 	c, err := redis.Dial("tcp", ":6379")
 	if err != nil {

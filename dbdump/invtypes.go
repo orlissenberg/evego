@@ -9,7 +9,7 @@ import (
 	elastic "github.com/mattbaird/elastigo/lib"
 )
 
-func ReadInvTypes() {
+func ReadSqlServer() {
 	db, _ := gorm.Open("mssql", `server=127.0.0.1;user id=eve;password=eve;database=eve_data`)
 	db.LogMode(true)
 	db.DB()
@@ -20,20 +20,77 @@ func ReadInvTypes() {
 	// Disable table name's pluralization
 	db.SingularTable(true)
 
-	var users []EveInvType
-	db.Find(&users)
-	for _, user := range users {
-		user.ElasticWrite()
-	}
-
+	// Hiding dev code 〜(￣△￣〜)
 	if false {
 		firstType := EveInvType{}
-		query := db.Find(&firstType, 620)
+		query := db.Find(&firstType, 19)
 		firstType.ElasticWrite()
 
+		firstStation := EveStation{}
+		query = db.Find(&firstStation, 60000004)
+		log.Println(firstStation.String())
 		log.Println(query.Error)
-		log.Println(firstType)
 	}
+
+	// Import inv types
+	var types []EveInvType
+	db.Find(&types)
+	for _, t := range types {
+		t.ElasticWrite()
+	}
+
+	// Import stations
+	var stations []EveStation
+	db.Find(&stations)
+	for _, s := range stations {
+		s.ElasticWrite()
+	}
+}
+
+func (e EveStation) TableName() string {
+	return "eve_data.dbo.staStations"
+}
+
+type EveStation struct {
+	Id                         int64 `gorm:"column:stationID;primary_key:yes"`
+	Security                   int8 `gorm:"column:security"`
+	DockingCostPerVolume       float32 `gorm:"column:dockingCostPerVolume"`
+	MaxShipVolumeDockable      float32 `gorm:"column:maxShipVolumeDockable"`
+	OfficeRentalCost           int32 `gorm:"column:officeRentalCost"`
+	OperationId                int64 `gorm:"column:operationID"`
+	StationTypeId              int64 `gorm:"column:stationTypeID"`
+	CorporationId              int64 `gorm:"column:corporationID"`
+	SolarSystemId              int64 `gorm:"column:solarSystemID"`
+	ConstellationId            int64 `gorm:"column:constellationID"`
+	RegionId                   int64 `gorm:"column:regionID"`
+	Name                       string `gorm:"column:stationName"`
+	X                          float32 `gorm:"column:x"`
+	Y                          float32 `gorm:"column:y"`
+	Z                          float32 `gorm:"column:z"`
+	ReprocessingEfficiency     float32 `gorm:"column:reprocessingEfficiency"`
+	ReprocessingStationsTake   float32 `gorm:"column:reprocessingStationsTake"`
+	ReprocessingHangarFlag     int8 `gorm:"column:reprocessingHangarFlag"`
+}
+
+func (station *EveStation) String() string {
+	if false {
+		data, _ := json.MarshalIndent(station, "", "    ");
+		return string(data)
+	}
+
+	return station.Name
+}
+
+func (station *EveStation) ElasticWrite() {
+	c := elastic.NewConn()
+	c.Hosts = []string{"192.168.33.48:9200"}
+
+	_, err := c.Index("eve", "station", strconv.FormatInt(int64(station.Id), 10), nil, station)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(station.String())
 }
 
 func (e EveInvType) TableName() string {
@@ -69,7 +126,7 @@ func (invType *EveInvType) ElasticWrite() {
 	c := elastic.NewConn()
 	c.Hosts = []string{"192.168.33.48:9200"}
 
-	_, err := c.Index("eve", "invtypes", strconv.FormatInt(int64(invType.Id), 10), nil, invType)
+	_, err := c.Index("eve", "invtype", strconv.FormatInt(int64(invType.Id), 10), nil, invType)
 	if err != nil {
 		log.Fatal(err)
 	}

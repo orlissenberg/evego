@@ -62,9 +62,11 @@ func (client *EmdrClient) Start(writer EmdrWriter) {
 
 		if err != nil {
 			if (errCount < 10) {
+				log.Println()
 				log.Println(err.Error())
 				errCount++;
 			} else {
+				log.Println()
 				log.Fatalln(err.Error())
 			}
 		}

@@ -7,7 +7,61 @@ import (
 	"log"
 )
 
-type ElasticEmdrWriter struct {}
+type EveReader struct {
+	*elastic.Conn
+}
+
+func (reader *EveReader) ReadRegion(id string) (region db.EveRegion, err error) {
+	region = db.EveRegion{}
+	err = reader.GetSource("eve", "region", id, nil, &region)
+
+	return
+}
+
+func (reader *EveReader) ReadSolarSystem(id string) (system db.EveSolarSystem, err error) {
+	system = db.EveSolarSystem{}
+	err = reader.GetSource("eve", "solarsystem", id, nil, &system)
+
+	return
+}
+
+func (reader *EveReader) ReadInvType(id string) (system db.EveInvType, err error) {
+	system = db.EveInvType{}
+	err = reader.GetSource("eve", "invtype", id, nil, &system)
+
+	return
+}
+
+func (reader *EveReader) ReadStation(id string) (station db.EveStation, err error) {
+	station = db.EveStation{}
+	err = reader.GetSource("eve", "station", id, nil, &station)
+
+	return
+}
+
+type ElasticEmdrWriter struct {
+	*elastic.Conn
+	*EveReader
+}
+
+func NewEveReader() *EveReader {
+	reader := new(EveReader)
+	reader.Conn = elastic.NewConn()
+	reader.Hosts = []string{"localhost"}
+
+	return reader
+}
+
+func NewElasticWriter() *ElasticEmdrWriter {
+	writer := new(ElasticEmdrWriter)
+	writer.Conn = elastic.NewConn()
+	writer.Hosts = []string{"localhost"}
+
+	writer.EveReader = new(EveReader)
+	writer.EveReader.Conn = writer.Conn
+
+	return writer
+}
 
 func (writer *ElasticEmdrWriter) Write(message []byte) (err error) {
 	var v EmdrMessage
@@ -17,28 +71,9 @@ func (writer *ElasticEmdrWriter) Write(message []byte) (err error) {
 	case "orders":
 		err = writer.WriteOrder(message)
 	case "history":
-		err = writer.WriteHistory(message)
+		// Soon! ...
+		// err = writer.WriteHistory(message)
 	}
-
-	return
-}
-
-func ReadRegion(id string) (region db.EveRegion, err error) {
-	c := elastic.NewConn()
-	c.Hosts = []string{"localhost"}
-
-	region = db.EveRegion{}
-	err = c.GetSource("eve", "region", id, nil, &region)
-
-	return
-}
-
-func ReadSolarSystem(id string) (system db.EveSolarSystem, err error) {
-	c := elastic.NewConn()
-	c.Hosts = []string{"localhost"}
-
-	system = db.EveSolarSystem{}
-	err = c.GetSource("eve", "solarsystem", id, nil, &system)
 
 	return
 }
@@ -46,14 +81,11 @@ func ReadSolarSystem(id string) (system db.EveSolarSystem, err error) {
 func (writer *ElasticEmdrWriter) WriteOrder(message []byte) (err error) {
 	order := new(EmdrOrderMessage)
 	json.Unmarshal(message, order)
-	order.mapRows()
-
-	c := elastic.NewConn()
-	c.Hosts = []string{"localhost"}
+	order.mapRows(writer.EveReader)
 
 	for _, s := range order.RowSets {
 		for _, o := range s.DataRows {
-			_, err = c.Index("eve", "order", "", nil, o)
+			_, err = writer.Index("eve", "order", "", nil, o)
 		}
 	}
 
@@ -64,12 +96,10 @@ func (writer *ElasticEmdrWriter) WriteOrder(message []byte) (err error) {
 func (writer *ElasticEmdrWriter) WriteHistory(message []byte) (err error) {
 	history := new(EmdrHistoryMessage)
 	json.Unmarshal(message, history)
-	history.mapRows()
+	history.mapRows(writer.EveReader)
 
-	c := elastic.NewConn()
-	c.Hosts = []string{"localhost"}
 	log.Println("History")
-	_, err = c.Index("eve", "history", "", nil, history)
+	_, err = writer.Index("eve", "history", "", nil, history)
 
 	return
 }
