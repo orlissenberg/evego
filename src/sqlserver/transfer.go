@@ -1,6 +1,7 @@
-package dbdump
+package sqlserver
 
 import (
+	"strings"
 	"log"
 	"strconv"
 	"encoding/json"
@@ -9,8 +10,12 @@ import (
 	elastic "github.com/mattbaird/elastigo/lib"
 )
 
-func ReadSqlServer() {
-	db, _ := gorm.Open("mssql", `server=127.0.0.1;user id=eve;password=eve;database=eve_data`)
+var verbose string
+
+func Transfer(settings map[string]string) {
+	verbose = settings["verbose"]
+
+	db, _ := gorm.Open("mssql", settings["sqlserver_connection"])
 	db.LogMode(true)
 	db.DB()
 
@@ -20,11 +25,14 @@ func ReadSqlServer() {
 	// Disable table name's pluralization
 	db.SingularTable(true)
 
+	c := elastic.NewConn()
+	c.Hosts = []string{settings["es_host"]}
+
 	// Hiding dev code 〜(￣△￣〜)
 	if false {
 		firstType := EveInvType{}
 		query := db.Find(&firstType, 19)
-		firstType.ElasticWrite()
+		firstType.ElasticWrite(c)
 
 		firstStation := EveStation{}
 		query = db.Find(&firstStation, 60000004)
@@ -36,14 +44,14 @@ func ReadSqlServer() {
 	var types []EveInvType
 	db.Find(&types)
 	for _, t := range types {
-		t.ElasticWrite()
+		t.ElasticWrite(c)
 	}
 
 	// Import stations
 	var stations []EveStation
 	db.Find(&stations)
 	for _, s := range stations {
-		s.ElasticWrite()
+		s.ElasticWrite(c)
 	}
 }
 
@@ -73,7 +81,7 @@ type EveStation struct {
 }
 
 func (station *EveStation) String() string {
-	if false {
+	if verbose == "vvv" {
 		data, _ := json.MarshalIndent(station, "", "    ");
 		return string(data)
 	}
@@ -81,16 +89,15 @@ func (station *EveStation) String() string {
 	return station.Name
 }
 
-func (station *EveStation) ElasticWrite() {
-	c := elastic.NewConn()
-	c.Hosts = []string{"192.168.33.48:9200"}
-
+func (station *EveStation) ElasticWrite(c *elastic.Conn) {
 	_, err := c.Index("eve", "station", strconv.FormatInt(int64(station.Id), 10), nil, station)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(station.String())
+	if strings.HasPrefix(verbose, "v") {
+		log.Println(station.String())
+	}
 }
 
 func (e EveInvType) TableName() string {
@@ -114,7 +121,7 @@ type EveInvType struct {
 }
 
 func (invType *EveInvType) String() string {
-	if false {
+	if verbose == "vvv" {
 		data, _ := json.MarshalIndent(invType, "", "    ");
 		return string(data)
 	}
@@ -122,14 +129,13 @@ func (invType *EveInvType) String() string {
 	return invType.Name
 }
 
-func (invType *EveInvType) ElasticWrite() {
-	c := elastic.NewConn()
-	c.Hosts = []string{"192.168.33.48:9200"}
-
+func (invType *EveInvType) ElasticWrite(c *elastic.Conn) {
 	_, err := c.Index("eve", "invtype", strconv.FormatInt(int64(invType.Id), 10), nil, invType)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(invType.String())
+	if strings.HasPrefix(verbose, "v") {
+		log.Println(invType.String())
+	}
 }

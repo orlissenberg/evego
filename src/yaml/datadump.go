@@ -1,9 +1,8 @@
-package datadump
+package yaml
 
 import (
 	"strconv"
 	"io/ioutil"
-
 	yaml "gopkg.in/yaml.v2"
 )
 

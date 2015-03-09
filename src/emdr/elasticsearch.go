@@ -1,25 +1,27 @@
 package emdr
 
 import (
+	"log"
+	"strconv"
 	"encoding/json"
 	elastic "github.com/mattbaird/elastigo/lib"
-	db "github.com/orlissenberg/evego/dbdump"
-	"log"
+	db "sqlserver"
+	lite "sqlite"
 )
 
 type EveReader struct {
 	*elastic.Conn
 }
 
-func (reader *EveReader) ReadRegion(id string) (region db.EveRegion, err error) {
-	region = db.EveRegion{}
+func (reader *EveReader) ReadRegion(id string) (region lite.EveRegion, err error) {
+	region = lite.EveRegion{}
 	err = reader.GetSource("eve", "region", id, nil, &region)
 
 	return
 }
 
-func (reader *EveReader) ReadSolarSystem(id string) (system db.EveSolarSystem, err error) {
-	system = db.EveSolarSystem{}
+func (reader *EveReader) ReadSolarSystem(id string) (system lite.EveSolarSystem, err error) {
+	system = lite.EveSolarSystem{}
 	err = reader.GetSource("eve", "solarsystem", id, nil, &system)
 
 	return
@@ -85,7 +87,7 @@ func (writer *ElasticEmdrWriter) WriteOrder(message []byte) (err error) {
 
 	for _, s := range order.RowSets {
 		for _, o := range s.DataRows {
-			_, err = writer.Index("eve", "order", "", nil, o)
+			_, err = writer.Index("eve", "order", strconv.FormatInt(o.OrderId, 10), nil, o)
 		}
 	}
 

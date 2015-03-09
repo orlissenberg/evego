@@ -1,4 +1,4 @@
-package dbdump
+package sqlite
 
 import (
 	"database/sql"

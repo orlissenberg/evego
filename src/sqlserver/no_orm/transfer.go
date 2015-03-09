@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func LoadInvTypes() {
+func Transfer() {
 	// connection string
 	connString := `server=localhost;user id=eve;password=eve;database=eve_data`
 
