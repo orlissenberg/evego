@@ -8,19 +8,23 @@ Go applications to import Eve Online data into Elasticsearch.
 - Solar systems (Sqlite)
 - Orders (EMDR)
 
-##Only build.
+**Build**
 
     ./build.sh
 
-##Only run.
+**Run**
 
     ./run.sh -verbose=vvv -es_host=elacticserver.here:9200 sqlite
 
-##Build and run.
+**Build & run.**
 
     ./build.sh -verbose=vvv -es_host=elacticserver.here:9200 emdr
 
-##Build & run SqlServer data import.
+**Build & run SqlServer data import (Windows).**
 
     ./wineve.cmd
+
+#### References
+
+[Eve Market Data Relay (EMDR)](https://eve-market-data-relay.readthedocs.org/en/latest/)
 

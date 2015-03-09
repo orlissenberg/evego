@@ -8,7 +8,7 @@ fi
 go build eve.go
 chmod 755 eve
 
-if [ $# > 0 ]
+if [ $# -gt 0 ]
 then
  ./run.sh $@
 fi
