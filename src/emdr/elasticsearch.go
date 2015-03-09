@@ -9,6 +9,8 @@ import (
 	lite "sqlite"
 )
 
+var ElasticsearchHosts []string
+
 type EveReader struct {
 	*elastic.Conn
 }
@@ -49,7 +51,7 @@ type ElasticEmdrWriter struct {
 func NewEveReader() *EveReader {
 	reader := new(EveReader)
 	reader.Conn = elastic.NewConn()
-	reader.Hosts = []string{"localhost"}
+	reader.Hosts = ElasticsearchHosts
 
 	return reader
 }
@@ -57,7 +59,7 @@ func NewEveReader() *EveReader {
 func NewElasticWriter() *ElasticEmdrWriter {
 	writer := new(ElasticEmdrWriter)
 	writer.Conn = elastic.NewConn()
-	writer.Hosts = []string{"localhost"}
+	writer.Hosts = ElasticsearchHosts
 
 	writer.EveReader = new(EveReader)
 	writer.EveReader.Conn = writer.Conn

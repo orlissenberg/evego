@@ -9,6 +9,8 @@ import (
 	"strconv"
 )
 
+var ElasticsearchHosts []string
+
 type RegionWriter interface {
 	Write(region EveRegion)
 }
@@ -25,18 +27,17 @@ func (region *EveRegion) String() string {
 // Stdout writer
 type StdoutRegionWriter struct {}
 
-func (std *StdoutRegionWriter) Write(region EveRegion) {
+func (writer *StdoutRegionWriter) Write(region EveRegion) {
 	fmt.Println(region.String())
 }
 
 // Elasticsearch writer
-type ElasticRegionWriter struct {}
+type ElasticRegionWriter struct {
+	*elastic.Conn
+}
 
-func (std *ElasticRegionWriter) Write(region EveRegion) {
-	c := elastic.NewConn()
-	c.Hosts = []string{"localhost"}
-
-	_, err := c.Index("eve", "region", strconv.FormatInt(region.Id, 10), nil, region)
+func (writer *ElasticRegionWriter) Write(region EveRegion) {
+	_, err := writer.Index("eve", "region", strconv.FormatInt(region.Id, 10), nil, region)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,18 +83,17 @@ func (SolarSystem *EveSolarSystem) String() string {
 // Stdout writer
 type StdoutSolarSystemWriter struct {}
 
-func (std *StdoutSolarSystemWriter) Write(SolarSystem EveSolarSystem) {
+func (writer *StdoutSolarSystemWriter) Write(SolarSystem EveSolarSystem) {
 	fmt.Println(SolarSystem.String())
 }
 
 // Elasticsearch writer
-type ElasticSolarSystemWriter struct {}
+type ElasticSolarSystemWriter struct {
+	*elastic.Conn
+}
 
-func (std *ElasticSolarSystemWriter) Write(SolarSystem EveSolarSystem) {
-	c := elastic.NewConn()
-	c.Hosts = []string{"localhost"}
-
-	_, err := c.Index("eve", "solarsystem", strconv.FormatInt(SolarSystem.Id, 10), nil, SolarSystem)
+func (writer *ElasticSolarSystemWriter) Write(SolarSystem EveSolarSystem) {
+	_, err := writer.Index("eve", "solarsystem", strconv.FormatInt(SolarSystem.Id, 10), nil, SolarSystem)
 	if err != nil {
 		log.Fatal(err)
 	}

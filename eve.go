@@ -7,9 +7,10 @@ import (
 	"io/ioutil"
 	"flag"
 	"emdr"
-	db "sqlite"
 	"strings"
+	db "sqlite"
 	yaml "gopkg.in/yaml.v2"
+	elastic "github.com/mattbaird/elastigo/lib"
 )
 
 type EveSettings map[string]string
@@ -21,13 +22,18 @@ func StartEmdrClient(settings EveSettings) {
 		log.Fatalln("Failed to connect.")
 	}
 
+	emdr.ElasticsearchHosts = []string{settings["es_host"]}
 	emdrClient.Start(emdr.NewElasticWriter())
 }
 
 func StartSqliteTransfer(settings EveSettings) {
 	path := settings["sqlite_path"]
-	db.ReadRegions(new(db.ElasticRegionWriter), path)
-	db.ReadSolarSystems(new(db.ElasticSolarSystemWriter), path)
+
+	c := elastic.NewConn()
+	c.Hosts = []string{settings["es_host"]}
+
+	db.ReadRegions(&db.ElasticRegionWriter{Conn: c}, path)
+	db.ReadSolarSystems(&db.ElasticSolarSystemWriter{Conn: c}, path)
 }
 
 func ReadSettings() (settings EveSettings) {
@@ -37,7 +43,7 @@ func ReadSettings() (settings EveSettings) {
 	}
 
 	var dat []byte;
-	dat, err = ioutil.ReadFile(dir + "/eve.yaml")
+	dat, err = ioutil.ReadFile(dir+"/eve.yaml")
 	settings = make(map[string]string)
 	yaml.Unmarshal(dat, &settings)
 
@@ -46,7 +52,7 @@ func ReadSettings() (settings EveSettings) {
 
 func main() {
 	// Load commandline flags.
-	elastic := flag.String("es_host", "127.0.0.1:9200", "Elasticsearch host.")
+	host := flag.String("es_host", "127.0.0.1:9200", "Elasticsearch host.")
 	verbose := flag.String("verbose", "", "Verbosity level.")
 	flag.Parse()
 	mode := flag.Args()
@@ -60,10 +66,11 @@ func main() {
 	// Load configuration.
 	settings := ReadSettings()
 	settings["verbose"] = *verbose
+	settings["es_host"] = *host
 
 	// Show runtime settings.
 	if strings.HasPrefix(*verbose, "v") {
-		log.Println(mode, *elastic, settings)
+		log.Println(mode, *host, settings)
 	}
 
 	// Execute mode, examples:

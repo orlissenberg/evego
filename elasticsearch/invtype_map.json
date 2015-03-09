@@ -1,0 +1,50 @@
+{
+  "invtype": {
+    "properties": {
+      "Mass": {
+        "type": "double"
+      },
+      "BasePrice": {
+        "type": "long"
+      },
+      "Capacity": {
+        "type": "long"
+      },
+      "Volume": {
+        "type": "long"
+      },
+      "PortionSize": {
+        "type": "long"
+      },
+      "Published": {
+        "type": "boolean"
+      },
+      "Id": {
+        "type": "long"
+      },
+      "MarketGroupId": {
+        "type": "long"
+      },
+      "RaceId": {
+        "type": "long"
+      },
+      "ChanceOfDuplicating": {
+        "type": "long"
+      },
+      "GroupId": {
+        "type": "long"
+      },
+      "Name": {
+        "type": "string",
+        "analyzer" : "standard",
+        "index": "analyzed",
+        "fields": {
+          "raw": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
+      }
+    }
+  }
+}

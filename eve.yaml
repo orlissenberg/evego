@@ -6,4 +6,5 @@ emdr_relay: "tcp://relay-us-central-1.eve-emdr.com:8050"
 
 sqlserver_connection: "server=127.0.0.1;user id=eve;password=eve;database=eve_data"
 
-sqlite_path: "/vagrant/projects/proteus_1.0_109795_db/universeDataDx.db"
+#sqlite_path: "/vagrant/projects/proteus_1.0_109795_db/universeDataDx.db"
+sqlite_path: "/vagrant/projects/tiamat_1.0_110751_db/universeDataDx.db"
