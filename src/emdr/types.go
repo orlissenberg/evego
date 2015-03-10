@@ -15,7 +15,7 @@ type EmdrMessage struct {
 
 type EmdrOrderRowSet struct {
 	TypeId      int64 "typeID"
-	RegionID    int64 "regionID"
+	RegionId    int64 "regionID"
 	GeneratedAt string "generatedAt"
 	Rows        [][]interface{} "rows" // Format not document friendly.
 	DataRows    []EmdrOrderDocument
@@ -46,9 +46,9 @@ type EmdrOrderDocument struct {
 	Bid                    bool
 	IssueDate              string
 	Duration               int64
-	StationID              int64
+	StationId              int64
 	StationName            string
-	SolarSystemID          int64
+	SolarSystemId          int64
 	SolarSystemName        string
 }
 
@@ -75,19 +75,19 @@ func (order *EmdrOrderMessage) mapRows(eve *EveReader) {
 				setOrderFieldValue(name, &mapping, rowValue[index])
 			}
 
-			mapping.RegionId = setValue.RegionID
+			mapping.RegionId = setValue.RegionId
 			mapping.TypeId = setValue.TypeId
 
 			region, _ := eve.ReadRegion(strconv.FormatInt(mapping.RegionId, 10))
 			mapping.RegionName = region.Name
 
-			solarsystem, _ := eve.ReadSolarSystem(strconv.FormatInt(mapping.SolarSystemID, 10))
+			solarsystem, _ := eve.ReadSolarSystem(strconv.FormatInt(mapping.SolarSystemId, 10))
 			mapping.SolarSystemName = solarsystem.Name
 
 			invtype, _ := eve.ReadInvType(strconv.FormatInt(mapping.TypeId, 10))
 			mapping.TypeName = invtype.Name
 
-			station, _ := eve.ReadStation(strconv.FormatInt(mapping.StationID, 10))
+			station, _ := eve.ReadStation(strconv.FormatInt(mapping.StationId, 10))
 			mapping.StationName = station.Name
 
 			order.RowSets[setIndex].DataRows[rowIndex] = mapping

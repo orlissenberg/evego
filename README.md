@@ -14,11 +14,11 @@ Go applications to import Eve Online data into Elasticsearch.
 
 **Run**
 
-    ./run.sh -verbose=vvv -es_host=elacticserver.here:9200 sqlite
+    ./run.sh -verbose=vvv -es_host=localhost:9200 sqlite
 
 **Build & run.**
 
-    ./build.sh -verbose=vvv -es_host=elacticserver.here:9200 emdr
+    ./build.sh -verbose=vvv -es_host=localhost:9200 emdr
 
 **Build & run SqlServer data import (Windows).**
 
@@ -27,4 +27,6 @@ Go applications to import Eve Online data into Elasticsearch.
 #### References
 
 [Eve Market Data Relay (EMDR)](https://eve-market-data-relay.readthedocs.org/en/latest/)
+
+[Elasticsearch Knapsack ](https://github.com/jprante/elasticsearch-knapsack)
 

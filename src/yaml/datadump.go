@@ -23,7 +23,7 @@ func ReadTypeIds(path string) (result EveTypeIdList, err error) {
 
 	for key, _ := range ids {
 		var val = ids[key]
-		val.TypeID, _ = strconv.ParseInt(key, 10, 32)
+		val.TypeId, _ = strconv.ParseInt(key, 10, 32)
 		ids[key] = val
 	}
 

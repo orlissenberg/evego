@@ -2,14 +2,19 @@
 
 HOST="localhost"
 
-#curl -XDELETE "http://$HOST:9200/eve/history"
+#curl -XDELETE "http://$HOST:9200/eve"
 #echo
-#curl -XPUT "http://localhost:9200/eve/_mapping/order" -d @./elasticsearch/history_map.json
+#curl -XPUT "http://$HOST:9200/eve/" -d @./elasticsearch/eve_index.json
 #echo
 
 #curl -XDELETE "http://$HOST:9200/eve/invtype"
 #echo
 #curl -XPUT "http://$HOST:9200/eve/_mapping/invtype" -d @./elasticsearch/invtype_map.json
+#echo
+
+#curl -XDELETE "http://$HOST:9200/eve/history"
+#echo
+#curl -XPUT "http://localhost:9200/eve/_mapping/history" -d @./elasticsearch/history_map.json
 #echo
 
 curl -XDELETE "http://$HOST:9200/eve/order"

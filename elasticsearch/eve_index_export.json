@@ -1,0 +1,229 @@
+{
+  "state": "open",
+  "settings": {
+    "index": {
+      "creation_date": "1426018528548",
+      "uuid": "vE9V7R_FTo67Mw1gQPzkAA",
+      "number_of_replicas": "1",
+      "number_of_shards": "5",
+      "version": {
+        "created": "1040499"
+      }
+    }
+  },
+  "mappings": {
+    "station": {
+      "properties": {
+        "DockingCostPerVolume": {
+          "type": "long"
+        },
+        "OperationId": {
+          "type": "long"
+        },
+        "ReprocessingStationsTake": {
+          "type": "double"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Security": {
+          "type": "long"
+        },
+        "ConstellationId": {
+          "type": "long"
+        },
+        "OfficeRentalCost": {
+          "type": "long"
+        },
+        "StationTypeId": {
+          "type": "long"
+        },
+        "ReprocessingHangarFlag": {
+          "type": "long"
+        },
+        "CorporationId": {
+          "type": "long"
+        },
+        "RegionId": {
+          "type": "long"
+        },
+        "ReprocessingEfficiency": {
+          "type": "double"
+        },
+        "SolarSystemId": {
+          "type": "long"
+        },
+        "Id": {
+          "type": "long"
+        },
+        "MaxShipVolumeDockable": {
+          "type": "double"
+        },
+        "Y": {
+          "type": "double"
+        },
+        "X": {
+          "type": "double"
+        },
+        "Z": {
+          "type": "double"
+        }
+      }
+    },
+    "invtype": {
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "Published": {
+          "type": "boolean"
+        },
+        "Volume": {
+          "type": "long"
+        },
+        "RaceId": {
+          "type": "long"
+        },
+        "PortionSize": {
+          "type": "long"
+        },
+        "GroupId": {
+          "type": "long"
+        },
+        "Name": {
+          "analyzer": "standard",
+          "type": "string",
+          "fields": {
+            "raw": {
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
+        },
+        "ChanceOfDuplicating": {
+          "type": "long"
+        },
+        "Mass": {
+          "type": "double"
+        },
+        "BasePrice": {
+          "type": "long"
+        },
+        "Id": {
+          "type": "long"
+        },
+        "Capacity": {
+          "type": "long"
+        },
+        "MarketGroupId": {
+          "type": "long"
+        }
+      }
+    },
+    "region": {
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Id": {
+          "type": "long"
+        }
+      }
+    },
+    "order": {
+      "properties": {
+        "IssueDate": {
+          "format": "dateOptionalTime",
+          "type": "date"
+        },
+        "Range": {
+          "type": "long"
+        },
+        "RegionName": {
+          "analyzer": "standard",
+          "type": "string",
+          "fields": {
+            "raw": {
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
+        },
+        "OrderId": {
+          "type": "long"
+        },
+        "VolEntered": {
+          "type": "long"
+        },
+        "Bid": {
+          "type": "boolean"
+        },
+        "TypeName": {
+          "analyzer": "standard",
+          "type": "string",
+          "fields": {
+            "raw": {
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
+        },
+        "MinVolume": {
+          "type": "long"
+        },
+        "VolRemaining": {
+          "type": "long"
+        },
+        "TypeId": {
+          "type": "long"
+        },
+        "SolarSystemName": {
+          "analyzer": "standard",
+          "type": "string",
+          "fields": {
+            "raw": {
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
+        },
+        "Duration": {
+          "type": "long"
+        },
+        "Price": {
+          "type": "double"
+        },
+        "RegionId": {
+          "type": "long"
+        },
+        "StationId": {
+          "type": "long"
+        },
+        "SolarSystemId": {
+          "type": "long"
+        },
+        "StationName": {
+          "analyzer": "standard",
+          "type": "string",
+          "fields": {
+            "raw": {
+              "index": "not_analyzed",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "solarsystem": {
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Id": {
+          "type": "long"
+        }
+      }
+    }
+  },
+  "aliases": []
+}

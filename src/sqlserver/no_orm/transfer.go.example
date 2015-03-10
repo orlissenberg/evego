@@ -50,18 +50,18 @@ func Transfer() {
 	for rows.Next() {
 		var inv EveInvType;
 		rows.Scan(
-			&inv.TypeID,
-			&inv.GroupID,
+			&inv.TypeId,
+			&inv.GroupId,
 			&inv.TypeName,
 			&inv.Description,
 			&inv.Mass,
 			&inv.Volume,
 			&inv.Capacity,
 			&inv.PortionSize,
-			&inv.RaceID,
+			&inv.RaceId,
 			&inv.BasePrice,
 			&inv.Published,
-			&inv.MarketGroupID,
+			&inv.MarketGroupId,
 			&inv.ChanceOfDuplicating,
 		)
 		invTypeList = append(invTypeList, inv)
@@ -77,17 +77,17 @@ func Transfer() {
 }
 
 type EveInvType struct {
-	TypeID int32
-	GroupID int32
+	TypeId int32
+	GroupId int32
 	TypeName string
 	Description string
 	Mass float32
 	Volume float32
 	Capacity float32
 	PortionSize int32
-	RaceID int32
+	RaceId int32
 	BasePrice float32
 	Published bool
-	MarketGroupID int32
+	MarketGroupId int32
 	ChanceOfDuplicating float32
 }

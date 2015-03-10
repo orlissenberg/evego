@@ -43,7 +43,7 @@
       "Price": {
         "type": "double"
       },
-      "StationID": {
+      "StationId": {
         "type": "long"
       },
       "StationName": {
@@ -71,7 +71,7 @@
           }
         }
       },
-      "SolarSystemID": {
+      "SolarSystemId": {
         "type": "long"
       },
       "SolarSystemName": {

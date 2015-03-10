@@ -19,13 +19,13 @@ func (item *EveTypeIdList) Keys() (keys []string) {
 }
 
 type EveTypeId struct {
-	TypeID         int64
-	GraphicID      int32 "graphicID"
+	TypeId         int64 "TypeID"
+	GraphicId      int32 "graphicID"
 	Radius         float32 "radius"
-	SoundID        int32 "soundID"
+	SoundId        int32 "soundID"
 	IconId         int32 "iconID"
 	SofFactionName string "sofFactionName"
-	FactionID      int32 "factionID"
+	FactionId      int32 "factionID"
 	Masteries map[string][]int32 "masteries"
 	Traits map[string]map[string]EveTrait "traits"
 }
@@ -33,7 +33,7 @@ type EveTypeId struct {
 type EveTrait struct {
 	Bonus     int32 "bonus"
 	BonusText string "bonusText"
-	UnitID    int32 "unitID"
+	UnitId    int32 "unitID"
 }
 
 type EveTypeIdWriter interface {
@@ -45,7 +45,7 @@ type ElasticEveTypeIdWriter struct {}
 func (writer *ElasticEveTypeIdWriter) Write(t EveTypeId) (err error) {
 	c := elastic.NewConn()
 	c.Hosts = []string{"localhost"}
-	_, err = c.Index("eve", "type_id", strconv.FormatInt(t.TypeID, 10), nil, t)
+	_, err = c.Index("eve", "type_id", strconv.FormatInt(t.TypeId, 10), nil, t)
 
 	return
 }

@@ -7,7 +7,6 @@ export PATH=$PATH:/opt/go/bin
 # Project path
 export GOPATH=/vagrant/projects/evego
 
-#go get github.com/pebbe/zmq3
 go get github.com/pebbe/zmq2
 go get github.com/mattbaird/elastigo
 go get gopkg.in/yaml.v2
