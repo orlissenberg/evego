@@ -5,7 +5,7 @@ export GOROOT=/opt/go
 export PATH=$PATH:/opt/go/bin
 
 # Project path
-export GOPATH=/vagrant/projects/evego
+export GOPATH=/opt/evego
 
 go get github.com/pebbe/zmq2
 go get github.com/mattbaird/elastigo
